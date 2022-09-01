@@ -6,18 +6,15 @@ const { sizes, pages } = require("../utils/pagination");
 const getAllProducts = async (req, res, next) => {
   const { sortBy } = req.query;
 
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.size);
-
   try {
     let allProducts = await Product.findAndCountAll({
-      limit: sizes(sizeAsNumber),
-      offset: +pages(pageAsNumber) * +sizes(sizeAsNumber),
+      limit: sizes(req.query),
+      offset: +pages(req.query) * +sizes(req.query),
       order: orderElements(sortBy),
     });
 
     res.status(200).json({
-      totalPages: Math.ceil(allProducts.count / sizes(sizeAsNumber)),
+      totalPages: Math.ceil(allProducts.count / sizes(req.query)),
       content: allProducts.rows,
     });
     next();
@@ -28,8 +25,7 @@ const getAllProducts = async (req, res, next) => {
 
 const searchProduct = async (req, res, next) => {
   const { term, sortBy } = req.query;
-  const pageAsNumber = Number.parseInt(req.query.page);
-  const sizeAsNumber = Number.parseInt(req.query.size);
+
 
   console.log("searhProduct");
   try {
@@ -40,23 +36,50 @@ const searchProduct = async (req, res, next) => {
             [Op.like]: "%" + term + "%",
           },
         },
-        limit: sizes(sizeAsNumber),
-        offset: +pages(pageAsNumber) * +sizes(sizeAsNumber),
+        limit: sizes(req.query),
+        offset: +pages(req.query) * +sizes(req.query),
         raw: true,
         order: orderElements(sortBy),
       });
-      console.log(products.count)
+      console.log(products.count);
       return res.status(200).json({
-        totalPages: Math.ceil(products.count / sizes(sizeAsNumber)),
+        totalPages: Math.ceil(products.count / sizes(req.query)),
         content: products.rows,
       });
     }
-    next()
+    next();
   } catch (error) {
-
-    res.status(500).json(error)
+    res.status(500).json(error);
     console.log(error);
   }
 };
 
-module.exports = { getAllProducts, searchProduct };
+const getProductByCategory = async (req, res, next) => {
+  const categoryId = req.params.id;
+  const { sortBy } = req.query;
+
+  try {
+    if (categoryId || sortBy) {
+      const products = await Product.findAndCountAll({
+        where: {
+          category: categoryId,
+        },
+        limit: sizes(req.query),
+        offset: +pages(req.query) * +sizes(req.query),
+        raw: true,
+        order: orderElements(sortBy),
+      });
+      return res
+        .status(200)
+        .json({
+          totalPages: Math.ceil((products.count / sizes(req.query))),
+          content: products.rows,
+        });
+    }
+    next();
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports = { getProductByCategory , getAllProducts, searchProduct };
