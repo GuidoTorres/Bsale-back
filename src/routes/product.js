@@ -1,6 +1,8 @@
+const { getAllProducts } = require('../controllers/product')
+
 const router = require('express').Router()
 
-router.get("/")
+router.get("/", getAllProducts)
 router.get("/search")
 router.get("/:id")
 
