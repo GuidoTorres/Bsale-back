@@ -4,10 +4,17 @@ const orderElements = require("../utils/orderElements");
 const { sizes, pages } = require("../utils/pagination");
 
 const getAllProducts = async (req, res, next) => {
-  const { sortBy } = req.query;
+  const { sortBy, prices } = req.query;
+  let price = [0, 10000];
+  if (prices !== undefined) {
+    price = [prices].map((item) => item.split(",")).flat();
+  }
 
   try {
     let allProducts = await Product.findAndCountAll({
+      where: {
+        price: { [Op.between]: price },
+      },
       limit: sizes(req.query),
       offset: +pages(req.query) * +sizes(req.query),
       order: orderElements(sortBy),
@@ -20,14 +27,17 @@ const getAllProducts = async (req, res, next) => {
     next();
   } catch (error) {
     res.status(500).json(error);
+    console.log(error);
   }
 };
 
 const searchProduct = async (req, res, next) => {
-  const { term, sortBy } = req.query;
+  const { term, sortBy, prices } = req.query;
 
-
-  console.log("searhProduct");
+  let price = [0, 10000];
+  if (prices !== undefined) {
+    price = [prices].map((item) => item.split(",")).flat();
+  }
   try {
     if (term) {
       const products = await Product.findAndCountAll({
@@ -35,6 +45,7 @@ const searchProduct = async (req, res, next) => {
           name: {
             [Op.like]: "%" + term + "%",
           },
+          price: { [Op.between]: price },
         },
         limit: sizes(req.query),
         offset: +pages(req.query) * +sizes(req.query),
@@ -56,25 +67,30 @@ const searchProduct = async (req, res, next) => {
 
 const getProductByCategory = async (req, res, next) => {
   const categoryId = req.params.id;
-  const { sortBy } = req.query;
+  const { sortBy, prices } = req.query;
+  let price = [0, 10000];
+  if (prices !== undefined) {
+    price = [prices].map((item) => item.split(",")).flat();
+  }
+
+  const ids = [categoryId].map((item) => item.split(",")).flat();
 
   try {
     if (categoryId || sortBy) {
       const products = await Product.findAndCountAll({
         where: {
-          category: categoryId,
+          category: ids,
         },
+        price: { [Op.between]: price },
         limit: sizes(req.query),
         offset: +pages(req.query) * +sizes(req.query),
         raw: true,
         order: orderElements(sortBy),
       });
-      return res
-        .status(200)
-        .json({
-          totalPages: Math.ceil((products.count / sizes(req.query))),
-          content: products.rows,
-        });
+      return res.status(200).json({
+        totalPages: Math.ceil(products.count / sizes(req.query)),
+        content: products.rows,
+      });
     }
     next();
   } catch (error) {
@@ -82,4 +98,4 @@ const getProductByCategory = async (req, res, next) => {
   }
 };
 
-module.exports = { getProductByCategory , getAllProducts, searchProduct };
+module.exports = { getProductByCategory, getAllProducts, searchProduct };
