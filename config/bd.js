@@ -3,11 +3,9 @@ const { Sequelize, DataTypes } = require("sequelize");
 const categoryModel = require("../src/models/category")
 const productModel = require("../src/models/product")
 
-const DB_URI = process.env.DB_URI;
-
 const sequelize = new Sequelize("bsale_test","bsale_test","bsale_test",{
 
-  host: DB_URI,
+  host:"mdb-test.c6vunyturrl6.us-west-1.rds.amazonaws.com",
   dialect: "mysql",
   define: { timestamps: false },
   pool: {
