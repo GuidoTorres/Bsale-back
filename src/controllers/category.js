@@ -2,6 +2,8 @@ const {Category} = require('../../config/bd')
 
 const getAllCategories = async(req, res, next) => {
 
+    console.log("get all categories")
+
     try {
         const allCategories = await Category.findAll();
         res.status(200).json(allCategories)

@@ -4,6 +4,7 @@ const orderElements = require("../utils/orderElements");
 const { sizes, pages } = require("../utils/pagination");
 
 const getAllProducts = async (req, res, next) => {
+  console.log("getAllProducts")
   const { sortBy, prices } = req.query;
   let price = [0, 10000];
   if (prices !== undefined) {
@@ -32,6 +33,8 @@ const getAllProducts = async (req, res, next) => {
 };
 
 const searchProduct = async (req, res, next) => {
+    console.log("searchProduct")
+
   const { term, sortBy, prices } = req.query;
 
   let price = [0, 10000];
@@ -66,6 +69,9 @@ const searchProduct = async (req, res, next) => {
 };
 
 const getProductByCategory = async (req, res, next) => {
+
+    console.log("getproductBycategory")
+
   const categoryId = req.params.id;
   const { sortBy, prices } = req.query;
   let price = [0, 10000];
