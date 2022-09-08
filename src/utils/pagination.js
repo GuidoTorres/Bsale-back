@@ -12,7 +12,7 @@ const pages = (query) => {
 const sizes = (query) => {
   const sizeAsNumber = Number.parseInt(query.size);
 
-  let size = 10;
+  let size = 12;
   if (!Number.isNaN(sizeAsNumber && sizeAsNumber > 0 && size < 12)) {
     size = sizeAsNumber;
   }
