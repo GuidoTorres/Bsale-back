@@ -33,10 +33,7 @@ const getAllProducts = async (req, res, next) => {
 };
 
 const searchProduct = async (req, res, next) => {
-    console.log("searchProduct")
-
   const { term, sortBy, prices } = req.query;
-
   let price = [0, 10000];
   if (prices !== undefined) {
     price = [prices].map((item) => item.split(",")).flat();
@@ -55,7 +52,6 @@ const searchProduct = async (req, res, next) => {
         raw: true,
         order: orderElements(sortBy),
       });
-      console.log(products.count);
       return res.status(200).json({
         totalPages: Math.ceil(products.count / sizes(req.query)),
         content: products.rows,
@@ -70,8 +66,6 @@ const searchProduct = async (req, res, next) => {
 
 const getProductByCategory = async (req, res, next) => {
 
-    console.log("getproductBycategory")
-
   const categoryId = req.params.id;
   const { sortBy, prices } = req.query;
   let price = [0, 10000];
@@ -80,6 +74,7 @@ const getProductByCategory = async (req, res, next) => {
   }
 
   const ids = [categoryId].map((item) => item.split(",")).flat();
+  console.log(ids);
 
   try {
     if (categoryId || sortBy) {
